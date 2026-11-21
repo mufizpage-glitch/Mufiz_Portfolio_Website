@@ -582,14 +582,14 @@
   @media (max-width:760px){ .process__top{grid-template-columns:1fr;} .meta-row{grid-template-columns:1fr; gap:22px;} }
 
   /* ============ MANIFESTO ============ */
-  .manifesto{background:transparent; color:var(--dark-ink); overflow:hidden;}
-  .manifesto__stage{position:relative; min-height:62vh; display:flex; align-items:center;}
+  .manifesto{background:transparent; color:var(--dark-ink);}
+  .manifesto__stage{position:relative; display:flex; align-items:center; padding:90px 0;}
   .manifesto__track{
-    display:flex; flex-wrap:wrap; align-items:baseline; gap:.3em .5em; padding:70px var(--gutter);
+    display:flex; flex-wrap:wrap; align-items:baseline; gap:.3em .5em; padding:0 var(--gutter);
+    max-width:1000px; margin:0 auto;
     font-family:var(--font-display); font-weight:700; letter-spacing:-.01em;
-    font-size:clamp(24px,3.6vw,46px); line-height:1.2;
+    font-size:clamp(22px,3vw,38px); line-height:1.35;
   }
-  .js-pin .manifesto__track{flex-wrap:nowrap; white-space:nowrap; padding:0 6vw; width:max-content;}
   .m-word{color:var(--dark-ink);}
   .m-word--muted{color:var(--dark-muted);}
   .m-big{font-family:var(--font-wordmark); font-weight:400; letter-spacing:.02em;}
@@ -1416,39 +1416,11 @@
     .to('#immersiveFrame', {borderRadius:0, scale:1, duration:1, ease:'power1.inOut'}, 0)
     .to('.immersive__label', {opacity:1, y:0, duration:.4}, .78);
 
-  /* ---------- MANIFESTO: pinned horizontal marquee ---------- */
-  var track = document.getElementById('manifestoTrack');
-
-  // measure after fonts/layout settle
-  requestAnimationFrame(function(){
-    setTimeout(function(){
-      var trackWidth = track.scrollWidth;
-      var viewW = window.innerWidth;
-      var distance = Math.max(trackWidth - viewW + viewW*0.1, viewW*0.5);
-
-      var children = gsap.utils.toArray('#manifestoTrack > *');
-      gsap.set(children, {opacity:0, y:22, rotation:function(i,el){ return el.classList.contains('m-pill') ? 0 : -6; }});
-
-      var mTl = gsap.timeline({
-        scrollTrigger:{
-          trigger:'#manifesto', start:'top top', end:'+=' + (distance + window.innerHeight*0.3),
-          scrub:1, pin:true, anticipatePin:1
-        }
-      });
-
-      // Reveal each word/pill timed to its real position in the track, not a uniform per-index
-      // stagger -- words vary a lot in width, so a fixed i*step offset let the horizontal slide
-      // carry a word into view well before (or after) its own fade finished, leaving a visible
-      // half-opacity word on screen and making the line hard to read. Basing the start fraction
-      // on offsetLeft keeps every word fully readable by the time it reaches the viewport.
-      mTl.to(track, {x:-distance, duration:1, ease:'none'}, 0);
-      var leadIn = window.innerWidth * 0.9;
-      children.forEach(function(el){
-        var startFrac = Math.max(0, Math.min((el.offsetLeft - leadIn) / distance, 0.88));
-        mTl.to(el, {opacity:1, y:0, rotation:0, duration:.1, ease:'back.out(1.6)'}, startFrac);
-      });
-    }, 60);
-  });
+  /* ---------- MANIFESTO: static paragraph, no scroll-jacking ----------
+     This used to be a pinned horizontal marquee (track slid sideways while
+     each word/pill faded in on its own timer). Removed entirely per
+     feedback -- it's shown as a plain wrapped paragraph now, so there's
+     nothing to animate or pin here. */
 
   /* ---------- nav dark swap on dark sections ---------- */
   ['#immersive', '#manifesto', '#contact'].forEach(function(sel){
