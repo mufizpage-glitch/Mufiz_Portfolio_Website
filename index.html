@@ -1346,9 +1346,12 @@
   // starting poses: a single clean crossfade-slide — no overlapping fan of rotated ghosts
   // xPercent baseline is -50 (not 0) because gsap's transform replaces the CSS
   // translate(-50%,-50%) centering once it takes over — the slide offset is layered on top of that.
+  // scale stays 1 throughout (no scale animation): two cards briefly overlapping at the SAME
+  // size line up edge-to-edge during the crossfade; animating scale made the incoming/outgoing
+  // card different sizes mid-transition, which read as misaligned even though both were centered.
   var poses = {
-    active: {xPercent:-50,  yPercent:-50, rotation:0, scale:1,   opacity:1, zIndex:2},
-    offR:   {xPercent:80,   yPercent:-50, rotation:0, scale:.94, opacity:0, zIndex:1}
+    active: {xPercent:-50,  yPercent:-50, rotation:0, scale:1, opacity:1, zIndex:2},
+    offR:   {xPercent:80,   yPercent:-50, rotation:0, scale:1, opacity:0, zIndex:1}
   };
 
   gsap.set(cards[0], Object.assign({left:'50%', top:'50%'}, poses.active));
@@ -1372,12 +1375,12 @@
 
   workTl
     .set(cards[1], {zIndex:2}, .22)
-    .to(cards[0], {xPercent:-180, opacity:0, scale:.94, duration:1, ease:'power1.inOut'}, .22)
-    .to(cards[1], {xPercent:-50,  opacity:1, scale:1,   duration:1, ease:'power1.inOut'}, .22)
+    .to(cards[0], {xPercent:-180, opacity:0, duration:1, ease:'power1.inOut'}, .22)
+    .to(cards[1], {xPercent:-50,  opacity:1, duration:1, ease:'power1.inOut'}, .22)
 
     .set(cards[2], {zIndex:3}, .62)
-    .to(cards[1], {xPercent:-180, opacity:0, scale:.94, duration:1, ease:'power1.inOut'}, .62)
-    .to(cards[2], {xPercent:-50,  opacity:1, scale:1,   duration:1, ease:'power1.inOut'}, .62);
+    .to(cards[1], {xPercent:-180, opacity:0, duration:1, ease:'power1.inOut'}, .62)
+    .to(cards[2], {xPercent:-50,  opacity:1, duration:1, ease:'power1.inOut'}, .62);
 
   /* ---------- IMMERSIVE: grow from rounded window to full-bleed ---------- */
   gsap.set('#immersiveFrame', {borderRadius:40, scale:.74});
