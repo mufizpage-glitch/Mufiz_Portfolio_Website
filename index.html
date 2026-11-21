@@ -1343,17 +1343,17 @@
   var cards = gsap.utils.toArray('.project-card');
   var dots = gsap.utils.toArray('#workDots span');
 
-  // starting poses: [x%, y%, rotation, scale, opacity, z]
+  // starting poses: a single clean crossfade-slide — no overlapping fan of rotated ghosts
+  // xPercent baseline is -50 (not 0) because gsap's transform replaces the CSS
+  // translate(-50%,-50%) centering once it takes over — the slide offset is layered on top of that.
   var poses = {
-    front:  {xPercent:0,   yPercent:-50, rotation:-1.5, scale:1,    opacity:1, zIndex:3},
-    waitR:  {xPercent:38,  yPercent:-46, rotation:6,    scale:.78,  opacity:.55, zIndex:2},
-    waitR2: {xPercent:60,  yPercent:-42, rotation:10,   scale:.6,   opacity:0,   zIndex:1},
-    exitL:  {xPercent:-70, yPercent:-54, rotation:-10,  scale:.72,  opacity:0,   zIndex:1}
+    active: {xPercent:-50,  yPercent:-50, rotation:0, scale:1,   opacity:1, zIndex:2},
+    offR:   {xPercent:80,   yPercent:-50, rotation:0, scale:.94, opacity:0, zIndex:1}
   };
 
-  gsap.set(cards[0], Object.assign({left:'50%', top:'50%'}, poses.front));
-  gsap.set(cards[1], Object.assign({left:'50%', top:'50%'}, poses.waitR));
-  gsap.set(cards[2], Object.assign({left:'50%', top:'50%'}, poses.waitR2));
+  gsap.set(cards[0], Object.assign({left:'50%', top:'50%'}, poses.active));
+  gsap.set(cards[1], Object.assign({left:'50%', top:'50%'}, poses.offR));
+  gsap.set(cards[2], Object.assign({left:'50%', top:'50%'}, poses.offR));
 
   function setDot(i){
     dots.forEach(function(d, idx){ d.classList.toggle('is-active', idx === i); });
@@ -1371,12 +1371,13 @@
   });
 
   workTl
-    .to(cards[0], {xPercent:-70, yPercent:-54, rotation:-10, scale:.72, opacity:0, duration:1}, .22)
-    .to(cards[1], {xPercent:0,   yPercent:-50, rotation:-1.5, scale:1,  opacity:1, duration:1}, .22)
-    .to(cards[2], {xPercent:38,  yPercent:-46, rotation:6,    scale:.78, opacity:.55, duration:1}, .22)
+    .set(cards[1], {zIndex:2}, .22)
+    .to(cards[0], {xPercent:-180, opacity:0, scale:.94, duration:1, ease:'power1.inOut'}, .22)
+    .to(cards[1], {xPercent:-50,  opacity:1, scale:1,   duration:1, ease:'power1.inOut'}, .22)
 
-    .to(cards[1], {xPercent:-70, yPercent:-54, rotation:-10, scale:.72, opacity:0, duration:1}, .62)
-    .to(cards[2], {xPercent:0,   yPercent:-50, rotation:-1.5, scale:1,  opacity:1, duration:1}, .62);
+    .set(cards[2], {zIndex:3}, .62)
+    .to(cards[1], {xPercent:-180, opacity:0, scale:.94, duration:1, ease:'power1.inOut'}, .62)
+    .to(cards[2], {xPercent:-50,  opacity:1, scale:1,   duration:1, ease:'power1.inOut'}, .62);
 
   /* ---------- IMMERSIVE: grow from rounded window to full-bleed ---------- */
   gsap.set('#immersiveFrame', {borderRadius:40, scale:.74});
