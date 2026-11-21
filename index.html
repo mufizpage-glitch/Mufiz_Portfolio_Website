@@ -567,7 +567,7 @@
   .manifesto{background:transparent; color:var(--dark-ink); overflow:hidden;}
   .manifesto__stage{position:relative; min-height:62vh; display:flex; align-items:center;}
   .manifesto__track{
-    display:flex; flex-wrap:wrap; align-items:center; gap:.3em .5em; padding:70px var(--gutter);
+    display:flex; flex-wrap:wrap; align-items:baseline; gap:.3em .5em; padding:70px var(--gutter);
     font-family:var(--font-display); font-weight:700; letter-spacing:-.01em;
     font-size:clamp(24px,3.6vw,46px); line-height:1.2;
   }
@@ -1416,9 +1416,16 @@
         }
       });
 
-      mTl.to(track, {x:-distance, duration:children.length, ease:'none'}, 0);
-      children.forEach(function(el, i){
-        mTl.to(el, {opacity:1, y:0, rotation:0, duration:.6, ease:'back.out(1.6)'}, i*0.78);
+      // Reveal each word/pill timed to its real position in the track, not a uniform per-index
+      // stagger -- words vary a lot in width, so a fixed i*step offset let the horizontal slide
+      // carry a word into view well before (or after) its own fade finished, leaving a visible
+      // half-opacity word on screen and making the line hard to read. Basing the start fraction
+      // on offsetLeft keeps every word fully readable by the time it reaches the viewport.
+      mTl.to(track, {x:-distance, duration:1, ease:'none'}, 0);
+      var leadIn = window.innerWidth * 0.9;
+      children.forEach(function(el){
+        var startFrac = Math.max(0, Math.min((el.offsetLeft - leadIn) / distance, 0.88));
+        mTl.to(el, {opacity:1, y:0, rotation:0, duration:.1, ease:'back.out(1.6)'}, startFrac);
       });
     }, 60);
   });
